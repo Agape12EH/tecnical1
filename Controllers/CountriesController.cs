@@ -21,67 +21,6 @@ namespace tecnical1.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet("response")]
-        public async Task<ActionResult<int>> Dto()
-        {
-            var countries = await context.Countries
-                .ProjectTo<CountryDTO>(mapper.ConfigurationProvider)
-                .ToListAsync();
-
-            return countries.Count();
-        }
-
-        [HttpGet]
-        public async Task<IEnumerable<Country>> Get()
-        {
-            return await context.Countries
-                .Include(c => c.Restaurants)
-                .Include(c => c.Hotels)
-                .AsNoTracking().ToListAsync();
-        }
-
-        //Filtro por Name IsoCode y Population   FALTA PARAMETROS[Name, ]
-        [HttpGet("filter")]
-        public async Task<IEnumerable<Country>> Filter()
-        {
-            return await context.Countries
-                .Where(
-                    c => c.Name.StartsWith("Co") || 
-                    c.isoCode.StartsWith("CO") || 
-                    c.Population.Equals(45000)
-                )
-                .OrderBy(c => c.Name)
-                .ToListAsync();
-        }
-
-        //ByID
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Country>> Get(int id)
-        {
-            var country = await context.Countries
-                .Include(c => c.Restaurants)
-                .Include(c => c.Hotels)
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (country == null)
-            {
-                return NotFound();
-            }
-
-            return country;
-        }
-
-        //Paginacion Faltan PARAMETROS INT
-        [HttpGet("paginacion")]
-        public async Task<ActionResult<IEnumerable<Country>>> GetPaginacion(int pageNumber = 1, int rowsPerPage = 10)
-        {
-            var Country = await context.Countries
-                .Skip((pageNumber - 1) * rowsPerPage)
-                .Take(rowsPerPage)
-                .ToListAsync();
-
-            return Country;
-        }
 
         [HttpGet("getpaginate")]
         public async Task<ActionResult<PaginadorGenerico<CountryDTO>>> GetPaginate(
